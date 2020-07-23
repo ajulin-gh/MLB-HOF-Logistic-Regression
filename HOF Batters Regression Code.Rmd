@@ -1,0 +1,46 @@
+---
+title: "Batter HOF Regression"
+author: "Anders Julin"
+date: "7/22/2020"
+output: html_document
+---
+
+```{r}
+library(readxl)
+batters<-read_excel("C:/Users/SEATT_000/Desktop/Summer Fun with Numbers/HOF BATTER TRAINING LIST.xlsm", col_names=TRUE)
+```
+
+Before Any Adjustments Have Been Made
+
+```{r}
+attach(batters)
+initialFit<-lm(HOF~Yrs+ASG+`WAR/pos`+G+PA+AB+R+H+`2B`+`3B`+HR+RBI+SB+CS+BB+SO+IBB+GDP+SF+SH+BA+OBP+SLG+OPS+GG+SS+MVP+WS+ROY, data=batters)
+summary(initialFit)
+```
+Adjusted R-Squared: .5917
+
+Manual Backward Elimination
+```{r}
+mBackwardFit<-lm(HOF~`WAR/pos`+PA+AB+R+H+`3B`+HR+RBI+SB+CS+SO+SH+BA+SLG+SS+MVP, data=batters)
+summary(mBackwardFit)
+```
+Adjusted R-Squared: .6379
+
+OLSRR Backward Elimination
+```{r}
+ols_step_backward_p(initialFit,details = TRUE)
+oBackwardFit<-lm(HOF~`WAR/pos`+PA+AB+R+H+`3B`+HR+RBI+SB+CS+SO+SH+BA+SLG+SS+MVP, data=batters)
+summary(oBackwardFit)
+```
+Adjusted R-Squared: .6379
+
+OLSRR Forward Elimination
+```{r}
+ols_step_forward_p(initialFit,details=TRUE)
+oForwardFit<-lm(HOF~PA+ASG+`WAR/pos`+MVP+SS+`2B`+R+OPS+`3B`+SH+SB+CS+SO,data=batters)
+summary(oForwardFit)
+```
+Adjusted R-Squared: .634
+
+
+Going to try and improve the OLSRR backwards elimination as it has the highest adjusted r-squared and was able to correctly identify 92/99 players. More if we remove outliers and data that should not be included.
