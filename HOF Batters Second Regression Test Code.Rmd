@@ -1,0 +1,45 @@
+---
+title: "HOF Batters Second Attempt"
+author: "Anders Julin"
+date: "7/23/2020"
+output: html_document
+---
+
+```{r}
+library(readxl)
+batters2<-read_excel("C:/Users/SEATT_000/Desktop/Summer Fun with Numbers/HOF BATTER TRAINING LIST.xlsm", col_names=TRUE)
+attach(batters2)
+```
+
+```{r}
+catcher<-ifelse(Position=="C",1,0)
+first<-ifelse(Position=="1B",1,0)
+second<-ifelse(Position=="2B",1,0)
+third<-ifelse(Position=="3B",1,0)
+short<-ifelse(Position=="SS",1,0)
+left<-ifelse(Position=="LF",1,0)
+center<-ifelse(Position=="CF",1,0)
+right<-ifelse(Position=="RF",1,0)
+```
+
+```{r}
+initialFitPosition<-lm(HOF~Yrs+ASG+`WAR/pos`+G+PA+AB+R+H+`2B`+`3B`+HR+RBI+SB+CS+BB+SO+IBB+GDP+SF+SH+BA+OBP+SLG+OPS+GG+SS+MVP+WS+ROY+catcher+first+second+third+short+left+center+right, data=batters2)
+summary(initialFitPosition)
+```
+Adjusted R-Squared: .6158
+Higher than the previous initial fit
+```{r}
+ols_step_backward_p(initialFitPosition,TRUE)
+oBackwardFitPosition<-lm(HOF~Yrs+ASG+`WAR/pos`+PA+AB+R+H+`3B`+HR+RBI+SB+CS+SO+SH+SLG+SS+MVP+first+second+third+short+left+center+right,data=batters2)
+summary(oBackwardFitPosition)
+```
+Adjusted R-Squared: .6723
+
+```{r}
+ols_step_forward_p(initialFitPosition,details=TRUE)
+oForwardFitPosition<-lm(HOF~PA+ASG+catcher+center+GDP+OPS+MVP+`3B`+R+SS+`2B`+SH+right+first,data=batters2)
+summary(oForwardFitPosition)
+```
+Adjusted R-Squared: .6775
+
+Forward gave the best new Adjusted R-Squared value
